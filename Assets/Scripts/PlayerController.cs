@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -9,7 +7,6 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float _speed;
     [SerializeField] private float _jumpForce;
-    [SerializeField] private UnityEvent _reached;
     [SerializeField] private Animator _animator;
 
     private Rigidbody2D _playerRigidbody2D;
@@ -19,11 +16,33 @@ public class PlayerController : MonoBehaviour
     private MoveState _moveState = MoveState.Idle;
     private float _walkTime = 0, _walkCooldown = 0.05f;
 
-    public void Dead()
+    public void Die()
     {
         _animator.SetBool(_animationHash.IsDead, true);
         _playerRigidbody2D.velocity = new Vector3(0, 0, 0);
         _speed = 0;
+    }
+
+    public void MoveRight()
+    {
+        if (_isFacingRight == false)
+        {
+            Flip();
+            _isFacingRight = true;
+        }
+
+        Move();
+    }
+
+    public void MoveLeft()
+    {
+        if (_isFacingRight == true)
+        {
+            Flip();
+            _isFacingRight = false;
+        }
+
+        Move();
     }
 
     private void Start()
@@ -34,33 +53,6 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKey(KeyCode.A))
-        {
-            if (_isFacingRight == true)
-            {
-                Flip();
-                _isFacingRight = false;
-            }
-
-            Move();
-        }
-
-        if (Input.GetKey(KeyCode.D))
-        {
-            if (_isFacingRight == false)
-            {
-                Flip();
-                _isFacingRight = true;
-            }
-
-            Move();
-        }
-
-        if (Input.GetKey(KeyCode.Space))
-        {
-            Jump();
-        }
-
         if (_playerRigidbody2D.velocity.y == 0)
         {
             _isGrounded = true;
@@ -99,7 +91,7 @@ public class PlayerController : MonoBehaviour
         transform.localScale = new Vector3(transform.localScale.x * -1, transform.localScale.y, transform.localScale.z);
     }
 
-    private void Jump()
+    public void Jump()
     {
         if (_isGrounded == true)
         {
@@ -107,15 +99,6 @@ public class PlayerController : MonoBehaviour
             _moveState = MoveState.Jump;
             _playerRigidbody2D.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
             _isGrounded = false;
-        }
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.TryGetComponent<Coin>(out Coin coin))
-        {
-            _reached.Invoke();
-            Destroy(collision.gameObject);
         }
     }
 

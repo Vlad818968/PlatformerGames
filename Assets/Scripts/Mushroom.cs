@@ -47,7 +47,7 @@ public class Mushroom : MonoBehaviour
         {
             if (collision.gameObject.transform.position.y > transform.position.y)
             {
-                StartCoroutine(Dead());
+                StartCoroutine(Die());
             }
             else
             {
@@ -56,7 +56,7 @@ public class Mushroom : MonoBehaviour
         }
     }
 
-    private IEnumerator Dead()
+    private IEnumerator Die()
     {
         GetComponent<CapsuleCollider2D>().enabled = false;
         _rigidbody2D.isKinematic = true;

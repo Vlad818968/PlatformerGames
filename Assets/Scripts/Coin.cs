@@ -1,18 +1,30 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+
+[RequireComponent(typeof(Collider2D))]
+[RequireComponent (typeof(SpriteRenderer))]
 
 public class Coin : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] private UnityEvent _reached;
+
+    private Collider2D _collider;
+    private SpriteRenderer _spriteRenderer;
+
+    private void Start()
     {
-        
+        _collider = GetComponent<Collider2D>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        
+        if (collision.TryGetComponent<PlayerController>(out PlayerController playerController))
+        {
+            _reached.Invoke();
+            _collider.enabled = false;
+            _spriteRenderer.enabled = false;
+            Destroy(gameObject,1);
+        }
     }
 }
